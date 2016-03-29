@@ -350,7 +350,7 @@ class Peripheral(BluepyHelper):
             raise ValueError("Expected MAC address, got %s" % repr(addr))
         if addrType not in (ADDR_TYPE_PUBLIC, ADDR_TYPE_RANDOM):
             raise ValueError("Expected address type public or random, got {}".format(addrType))
-        self._startHelper()
+        self._startHelper(iface=iface)
         self.deviceAddr = addr
         self.addrType = addrType
         self.iface = iface
@@ -462,6 +462,9 @@ class Peripheral(BluepyHelper):
         self._writeCmd("secu %s\n" % level)
         return self._getResp('stat')
 
+    def pair(self):
+        self._mgmtCmd("pair")
+
     def unpair(self, address):
         self._mgmtCmd("unpair %s" % (address))
 
@@ -470,7 +473,7 @@ class Peripheral(BluepyHelper):
         return self._getResp('stat')
 
     def waitForNotifications(self, timeout):
-         resp = self._getResp('ntfy', timeout)
+         resp = self._getResp(['ntfy', 'ind'], timeout)
          return (resp != None)
 
     def __del__(self):
